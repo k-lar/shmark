@@ -1,0 +1,130 @@
+#!/bin/sh
+# set -xe
+
+Help() {
+    printf "%b"                                                                                 \
+    "Help menu blablabla\n"
+}
+
+TrimLeading() {
+    # Remove all leading white-space.
+    # '${1%%[![:space:]]*}': Strip everything but leading white-space.
+    # '${1#${XXX}}': Remove the white-space from the start of the string.
+    trim=${1#${1%%[![:space:]]*}}
+    printf '%s' "$trim"
+}
+
+TrimTrailing() {
+    # Remove all trailing white-space.
+    # '${trim##*[![:space:]]}': Strip everything but trailing white-space.
+    # '${trim%${XXX}}': Remove the white-space from the end of the string.
+    trim=${trim%${trim##*[![:space:]]}}
+    printf '%s' "$trim"
+}
+
+StartStrip() {
+    # Usage: lstrip "string" "pattern"
+    printf '%s\n' "${1##$2}"
+}
+
+EndStrip() {
+    # Usage: rstrip "string" "pattern"
+    printf '%s\n' "${1%%$2}"
+}
+
+IsHeader() {
+    line="$1"
+    case "$line" in
+        "######"*)
+            echo 6;;
+        "#####"*)
+            echo 5;;
+        "####"*)
+            echo 4;;
+        "###"*)
+            echo 3;;
+        "##"*)
+            echo 2;;
+        "#"*)
+            echo 1;;
+        *)
+            echo 0;;
+    esac
+}
+
+CreateHeading() {
+    heading="$1"
+    level="$(IsHeader $heading)"
+    hash_counter=""
+    for i in 1 2 3 4 5 6; do
+        if [ $i -lt $level ] || [ $i -eq $level ]; then
+            hash_counter="${hash_counter}#"
+        fi
+    done
+    hash_counter="${hash_counter} "
+    heading="$(StartStrip "$heading" "$hash_counter")"
+    heading="<h$level>$heading</h$level>"
+    printf '%s' "$heading"
+}
+
+ParseFile() {
+    file="$1"
+    while IFS= read -r line || [ -n "$line" ]; do
+        line="$(TrimLeading "$line")"
+
+        # Headings
+        if [ $(IsHeader $line) -gt 0 ]; then
+            line="$(CreateHeading "$line")"
+            printf '%s\n' "$line"
+
+        # Breaklines
+        elif [ "$line" = "\\" ]; then
+            line="<br>"
+            printf '%s\n' "$line"
+
+        # Paragraphs
+        elif [ "$line" = "" ]; then
+            printf '%s\n' "$line"
+
+        else
+            printf '<p>%s</p>\n' "$line"
+        fi
+
+
+
+    done < "$file"
+}
+
+Main() {
+if [ "$#" -eq 0 ]; then
+    Help
+fi
+
+while [ "$#" -gt 0 ]; do
+
+    case "$1" in
+        "-h"|"--help")
+            Help;;
+
+    esac
+
+    if [ -f "$1" ]; then
+        case "$1" in
+            *.md)
+                ParseFile "$1";;
+
+            *.markdown)
+                ParseFile "$1";;
+
+        esac
+    else
+        printf 'File: %s does not exist.\n' "$1"
+    fi
+
+    shift
+done
+}
+
+Main "$@"
+
+
