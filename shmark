@@ -35,6 +35,8 @@ EndStrip() {
 IsHeader() {
     line="$1"
     case "$line" in
+        "#######"*)
+            echo 7;;
         "######"*)
             echo 6;;
         "#####"*)
@@ -55,16 +57,26 @@ IsHeader() {
 CreateHeading() {
     heading="$1"
     level="$(IsHeader $heading)"
-    hash_counter=""
-    for i in 1 2 3 4 5 6; do
-        if [ $i -lt $level ] || [ $i -eq $level ]; then
-            hash_counter="${hash_counter}#"
-        fi
-    done
-    hash_counter="${hash_counter} "
-    heading="$(StartStrip "$heading" "$hash_counter")"
-    heading="<h$level>$heading</h$level>"
+
+    if [ $level -gt 6 ]; then
+        heading="$(echo $heading | sed -e 's/^.*# //')"
+        heading="<h6>$heading</h6>"
+
+    else
+        hash_counter=""
+        for i in 1 2 3 4 5 6; do
+            if [ $i -lt $level ] || [ $i -eq $level ]; then
+                hash_counter="${hash_counter}#"
+            fi
+        done
+        hash_counter="${hash_counter} "
+        heading="$(StartStrip "$heading" "$hash_counter")"
+        heading="<h$level>$heading</h$level>"
+
+    fi
+
     printf '%s' "$heading"
+
 }
 
 ParseFile() {
