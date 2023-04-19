@@ -76,6 +76,64 @@ CreateHeading() {
     fi
 
     printf '%s' "$heading"
+}
+
+# AlternateBold() {
+
+# }
+
+CheckBold() {
+    already_bolded="$2"
+    word="$1"
+    case $word in
+        "**"*)
+            word=${word#\*\*}
+            if [ ! "$already_bolded" -eq 1 ]; then
+                printf '<strong>%s ' "$word"
+                already_bolded=1
+            else
+                printf '</strong>%s ' "$word"
+            fi
+            ;;
+
+        *"**"*)
+            if [ ! "$already_bolded" -eq 1 ]; then
+                printf '%s' "$(echo $word | sed 's/\*\*/<strong>/')"
+                already_bolded=1
+            else
+                printf '%s' "$(echo $word | sed 's/\*\*/</strong>/')"
+            fi
+            ;;
+
+        *"**")
+            word=${word%\*\*}
+            printf '%s</strong> ' "$word"
+            ;;
+
+        # "**"*"**")
+        #     printf '<strong>%s </strong>' "$word"
+        #     ;;
+
+        *)
+            printf '%s ' "$word"
+            ;;
+
+    esac
+}
+
+CheckItalics() {
+    word="$1"
+    case $word in
+
+    esac
+
+}
+
+ParseLine() {
+    line="$1"
+    for token in $line; do
+        CheckBold "$token" 0
+    done
 
 }
 
@@ -99,10 +157,9 @@ ParseFile() {
             printf '%s\n' "$line"
 
         else
-            printf '<p>%s</p>\n' "$line"
+            # printf '<p>%s</p>\n' "$line"
+            ParseLine "$line"
         fi
-
-
 
     done < "$file"
 }
