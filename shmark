@@ -79,13 +79,10 @@ CreateHeading() {
 }
 
 CheckBold() {
-    #found_bold=0
-
+    word="$1"
     if [ -z "$already_bolded" ]; then
         already_bolded=0
     fi
-
-    word="$1"
 
     # Check start of word
     case $word in
@@ -139,29 +136,40 @@ CheckItalics() {
 
 }
 
-# EndsWithDoubleSpace() {
-#     line="$1"
-#     case $line in
-#         *"  ")
-#             echo 1;;
+EndsWithDoubleSpace() {
+    line="$1"
+    case "$line" in
+        *"  ")
+            echo 1;;
 
-#         *)
-#             echo 0;;
-#     esac
+        *)
+            echo 0;;
+    esac
 
-# }
+    # IFS=$OLDIFS
+}
 
 ParseLine() {
     line="$1"
-    # end_with_br="$(EndsWithDoubleSpace $line)"
+    end_with_br="$(EndsWithDoubleSpace "$line")"
+    if [ -z "$paragraph_started" ]; then
+        paragraph_started=0
+    fi
+
+    if [ $paragraph_started -ne 1 ]; then
+        printf '<p>'
+        paragraph_started=1
+    fi
 
     for token in $line; do
         CheckBold "$token"
     done
+    # printf '</p>'
 
-    # if [ "$end_with_br" -eq 1 ]; then
-    #     printf '<br>'
-    # fi
+    if [ "$end_with_br" -eq 1 ]; then
+        printf '</p>'
+        paragraph_started=0
+    fi
 
 }
 
