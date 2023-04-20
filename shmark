@@ -1,5 +1,5 @@
 #!/bin/sh
-set -xe
+# set -xe
 
 Help() {
     printf "%b"                                                                                 \
@@ -220,7 +220,7 @@ CheckBullets() {
 
     case "$line" in
         "- "*|"* "*)
-            line="${line:2}"
+            line="${line#- }" # Trim away "- "
             printf '<ul><li>%s</li></ul>' "$line"
     esac
 }
