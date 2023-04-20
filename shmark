@@ -1,5 +1,5 @@
 #!/bin/sh
-set -xe
+# set -xe
 
 Help() {
     printf "%b"                                                                                 \
@@ -104,6 +104,12 @@ CheckBold() {
             if [ ! $already_bolded -eq 1 ]; then
                 word="$(echo $word | sed 's/\*\*/<strong>/')"
                 already_bolded=1
+                case $word in
+                    *"**"*)
+                        word="$(echo $word | sed 's/\*\*/<\/strong>/')"
+                        already_bolded=0
+                        ;;
+                esac
             else
                 word="$(echo $word | sed 's/\*\*/<\/strong>/')"
                 already_bolded=0
