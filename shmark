@@ -1,5 +1,5 @@
 #!/bin/sh
-# set -xe
+set -xe
 
 Help() {
     printf "%b"                                                                                 \
@@ -78,47 +78,57 @@ CreateHeading() {
     printf '%s' "$heading"
 }
 
-# AlternateBold() {
-
-# }
-
 CheckBold() {
-    already_bolded="$2"
+    #found_bold=0
+
+    if [ -z "$already_bolded" ]; then
+        already_bolded=0
+    fi
+
     word="$1"
+
+    # Check start of word
     case $word in
         "**"*)
             word=${word#\*\*}
-            if [ ! "$already_bolded" -eq 1 ]; then
-                printf '<strong>%s ' "$word"
+            if ! [ $already_bolded -eq 1 ]; then
+                word="$(printf '<strong>%s' "$word")"
                 already_bolded=1
-            else
-                printf '</strong>%s ' "$word"
+            elif [ $already_bolded -eq 1 ]; then
+                word="$(printf '</strong>%s' "$word")"
+                already_bolded=0
             fi
             ;;
+    esac
 
+    # Check if middle of word contains "**"
+    case $word in
         *"**"*)
-            if [ ! "$already_bolded" -eq 1 ]; then
-                printf '%s' "$(echo $word | sed 's/\*\*/<strong>/')"
+            if [ ! $already_bolded -eq 1 ]; then
+                word="$(echo $word | sed 's/\*\*/<strong>/')"
                 already_bolded=1
             else
-                printf '%s' "$(echo $word | sed 's/\*\*/</strong>/')"
+                word="$(echo $word | sed 's/\*\*/<\/strong>/')"
+                already_bolded=0
             fi
             ;;
+    esac
 
+    # Check end of word
+    case $word in
         *"**")
             word=${word%\*\*}
-            printf '%s</strong> ' "$word"
+            if [ ! $already_bolded -eq 1 ]; then
+                word="$(printf '%s<strong>' "$word")"
+                already_bolded=1
+            else
+                word="$(printf '%s</strong>' "$word")"
+                already_bolded=0
+            fi
             ;;
-
-        # "**"*"**")
-        #     printf '<strong>%s </strong>' "$word"
-        #     ;;
-
-        *)
-            printf '%s ' "$word"
-            ;;
-
     esac
+
+    printf '%s ' "$word"
 }
 
 CheckItalics() {
@@ -129,11 +139,29 @@ CheckItalics() {
 
 }
 
+# EndsWithDoubleSpace() {
+#     line="$1"
+#     case $line in
+#         *"  ")
+#             echo 1;;
+
+#         *)
+#             echo 0;;
+#     esac
+
+# }
+
 ParseLine() {
     line="$1"
+    # end_with_br="$(EndsWithDoubleSpace $line)"
+
     for token in $line; do
-        CheckBold "$token" 0
+        CheckBold "$token"
     done
+
+    # if [ "$end_with_br" -eq 1 ]; then
+    #     printf '<br>'
+    # fi
 
 }
 
