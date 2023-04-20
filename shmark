@@ -136,9 +136,58 @@ CheckBold() {
 
 CheckItalics() {
     word="$1"
-    case $word in
+    if [ -z "$already_italics" ]; then
+        already_italics=0
+    fi
 
+    # Check start of word
+    case $word in
+        "__"*)
+            word=${word#__}
+            if ! [ $already_italics -eq 1 ]; then
+                word="$(printf '<i>%s' "$word")"
+                already_italics=1
+            elif [ $already_italics -eq 1 ]; then
+                word="$(printf '</i>%s' "$word")"
+                already_italics=0
+            fi
+            ;;
     esac
+
+    # Check if middle of word contains "**"
+    case $word in
+        *"__"*)
+            if [ ! $already_italics -eq 1 ]; then
+                word="$(echo $word | sed 's/__/<i>/')"
+                already_italics=1
+                case $word in
+                    *"__"*)
+                        word="$(echo $word | sed 's/__/<\/i>/')"
+                        already_italics=0
+                        ;;
+                esac
+            else
+                word="$(echo $word | sed 's/__/<\/i>/')"
+                already_italics=0
+            fi
+            ;;
+    esac
+
+    # Check end of word
+    case $word in
+        *"__")
+            word=${word%__}
+            if [ ! $already_italics -eq 1 ]; then
+                word="$(printf '%s<i>' "$word")"
+                already_italics=1
+            else
+                word="$(printf '%s</i>' "$word")"
+                already_italics=0
+            fi
+            ;;
+    esac
+
+    printf '%s ' "$word"
 
 }
 
@@ -155,6 +204,20 @@ EndsWithDoubleSpace() {
     # IFS=$OLDIFS
 }
 
+ConcatBoldTokens() {
+    line="$1"
+    for token in $line; do
+        CheckBold "$token"
+    done
+}
+
+ConcatItalicsTokens() {
+    line="$1"
+    for token in $line; do
+        CheckItalics "$token"
+    done
+}
+
 ParseLine() {
     line="$1"
     end_with_br="$(EndsWithDoubleSpace "$line")"
@@ -167,10 +230,21 @@ ParseLine() {
         paragraph_started=1
     fi
 
-    for token in $line; do
-        CheckBold "$token"
-    done
-    # printf '</p>'
+    # tokens=""
+    # for token in $line; do
+    #     # tokens="${tokens}$(CheckBold "$token")"
+    #     CheckBold "$token"
+    # done
+
+    tokens="$(ConcatBoldTokens "$line")"
+
+    bolded_tokens="$tokens"
+    tokens=""
+
+    tokens="$(ConcatItalicsTokens "$bolded_tokens")"
+
+
+    printf '%s' "$tokens"
 
     if [ "$end_with_br" -eq 1 ]; then
         printf '</p>'
