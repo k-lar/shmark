@@ -39,3 +39,6 @@ __Italics whole paragraph__
 Only __two words__  
 
 What about **__bolditalics?__**  
+
+- Regular bullet point
+- Bullet point with **bold**!
