@@ -30,15 +30,15 @@ Middle**word**-bolding
 
 \
 
-Here are some __italics__  
+Here are some _italics_  
 
 \
 
-__Italics whole paragraph__  
+_Italics whole paragraph_  
 
-Only __two words__  
+Only _two words_  
 
-What about **__bolditalics?__**  
+What about **_bolditalics?_**  
 
 - Regular bullet point
 - Bullet point with **bold**!

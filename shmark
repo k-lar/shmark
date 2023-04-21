@@ -144,8 +144,8 @@ CheckItalics() {
 
     # Check start of word
     case $word in
-        "__"*)
-            word=${word#__}
+        "_"*)
+            word=${word#_}
             if ! [ $already_italics -eq 1 ]; then
                 word="$(printf '<i>%s' "$word")"
                 already_italics=1
@@ -158,18 +158,18 @@ CheckItalics() {
 
     # Check if middle of word contains "**"
     case $word in
-        *"__"*)
+        *"_"*)
             if [ ! $already_italics -eq 1 ]; then
-                word="$(echo $word | sed 's/__/<i>/')"
+                word="$(echo $word | sed 's/_/<i>/')"
                 already_italics=1
                 case $word in
-                    *"__"*)
-                        word="$(echo $word | sed 's/__/<\/i>/')"
+                    *"_"*)
+                        word="$(echo $word | sed 's/_/<\/i>/')"
                         already_italics=0
                         ;;
                 esac
             else
-                word="$(echo $word | sed 's/__/<\/i>/')"
+                word="$(echo $word | sed 's/_/<\/i>/')"
                 already_italics=0
             fi
             ;;
@@ -177,8 +177,8 @@ CheckItalics() {
 
     # Check end of word
     case $word in
-        *"__")
-            word=${word%__}
+        *"_")
+            word=${word%_}
             if [ ! $already_italics -eq 1 ]; then
                 word="$(printf '%s<i>' "$word")"
                 already_italics=1
