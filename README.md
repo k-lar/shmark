@@ -30,3 +30,6 @@ It currently supports a small subset of markdown:
 ./shmark file.md > rendered.html
 ```
 
+## Demonstration
+
+![Side by side html and markdown](https://gitlab.com/k_lar/shmark/uploads/b0b30c040147ac108a6ac517b1ec6604/shmark.png)
