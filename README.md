@@ -17,7 +17,7 @@ It currently supports a small subset of markdown:
 - Italics
 - Single bullet points
     *  Can't nest them like this
-- Can use "\" to make breakline (`<br>`)
+- Can use "\\" to make breakline (`<br>`)
 
 
 ## Usage
