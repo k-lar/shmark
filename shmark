@@ -2,8 +2,10 @@
 # set -xe
 
 Help() {
-    printf "%b"                                                                                 \
-    "Help menu blablabla\n"
+    printf "%b" \
+    "Usage:\n" \
+    "./shmark file.md                    Prints the converted text in html inside the terminal\n" \
+    "./shmark file.md > file.html        Pipes the output into the html file, so it can be seen in a browser\n"
 }
 
 TrimLeading() {
@@ -294,7 +296,8 @@ while [ "$#" -gt 0 ]; do
 
     case "$1" in
         "-h"|"--help")
-            Help;;
+            Help
+            exit 0;;
 
     esac
 
