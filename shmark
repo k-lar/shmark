@@ -246,7 +246,7 @@ ParseLine() {
 
     tokens="$(ConcatItalicsTokens "$bolded_tokens")"
 
-    printf '%s' "$tokens"
+    printf '%s' "${tokens%?}"
 
     if [ "$end_with_br" -eq 1 ]; then
         printf '</p>'
